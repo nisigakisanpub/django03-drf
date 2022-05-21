@@ -40,7 +40,7 @@ auth_user                   django_migrations
 auth_user_groups            django_session
 auth_user_user_permissions
 ```
-- (観点) 認証に関わっているのはどれか
+
   
 
 ## ソース解説
@@ -100,13 +100,18 @@ Vary: Accept
 - api-auth/logout/
 
 
-#### ◆DefaultRouter がわからない
-
-This router is similar to SimpleRouter as above, but additionally includes a default API root view, that returns a response containing hyperlinks to all the list views. It also generates routes for optional .json style format suffixes.  
-https://www.django-rest-framework.org/api-guide/routers/#defaultrouter
-
-
 ### フロントエンド
 - templates/index.html に埋め込まれている
+
+　
+## 質問
+
+- テーブル一覧で、認証に関わっているのはどれか
+
+- DefaultRouter と SimpleRouter 何が違う？一個ではダメな理由？
+```
+This router is similar to SimpleRouter as above, but additionally includes a default API root view, that returns a response containing hyperlinks to all the list views. It also generates routes for optional .json style format suffixes.  
+https://www.django-rest-framework.org/api-guide/routers/#defaultrouter
+```
 
 
