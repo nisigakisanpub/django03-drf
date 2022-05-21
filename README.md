@@ -1,7 +1,7 @@
 ## DRF＋CDN版Vue.js＋Cookie認証（Django REST framework）
 『現場で使える Django REST Framework の教科書』
 
-### 手順
+### 手順・バージョン
 
 ```
 python --version  
@@ -31,7 +31,7 @@ admin / admin@example.com / pass12345
 python manage.py runserver  
 ```
 
-### テーブル一覧
+## テーブル一覧
 ```
 auth_group                  book  
 auth_group_permissions      django_admin_log  
@@ -41,8 +41,7 @@ auth_user_groups            django_session
 auth_user_user_permissions
 ```
 
-  
-
+　
 ## ソース解説
 
 ### アプリが2個
