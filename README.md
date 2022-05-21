@@ -113,4 +113,10 @@ This router is similar to SimpleRouter as above, but additionally includes a def
 https://www.django-rest-framework.org/api-guide/routers/#defaultrouter
 ```
 
+- ここ、入れ子の時はどう書くの？（Book-Author みたいなリレーション）
+```
+router = routers.DefaultRouter()
+router.register('books', views.BookViewSet)
+```
+
 
