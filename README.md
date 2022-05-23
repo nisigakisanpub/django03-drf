@@ -75,7 +75,6 @@ python manage.py runserver
 ### 手順（コーディング）
 
 ```
-
 // setting.py 改修
 
 INSTALLED_APPS = [
@@ -223,9 +222,144 @@ auth_user_user_permissions
 　
 ## ソース解説
 
-### アプリが2個
+#### アプリが2個
 - shop
 - apiv1
+
+#### フロントエンド
+templates/index.html に埋め込まれている
+
+#### ログイン判定
+```
+templates/index.html
+====
+{% if user.is_authenticated %}
+
+config/settings.py
+====
+INSTALLED_APPS = [
+    "django.contrib.auth",
+```
+
+#### クライアント側で、サーバー側の認証結果を受け取る
+```
+templates/index.html
+====
+if (status === 400) {
+  // バリデーションNG
+  this.message.warnings = [].concat.apply(
+    [],
+    Object.values(error.response.data)
+  );
+} else if (status === 401) {
+  // 認証エラー
+  this.message.error = "認証エラー";
+} else if (status === 403) {
+  // 権限エラー
+  this.message.error = "権限エラーです。";
+} else {
+  // その他のエラー
+  this.message.error = "想定外のエラーです。";
+}
+```
+
+#### axiosの使い方、特にCSRFトークンの送信設定
+```
+templates/index.html
+====
+<!-- axios -->
+<script src="https://unpkg.com/axios@0.21.1/dist/axios.min.js"></script>
+<script>
+  // CSRFトークンの送信設定
+  axios.defaults.xsrfCookieName = "csrftoken";
+  axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
+  // APIクライアント
+  const api = axios.create({
+    baseURL: "/api/v1/",
+    timeout: 5000,
+    headers: {
+"Content-Type": "application/json",
+"X-Requested-With": "XMLHttpRequest"
+    }
+  });
+
+templates/index.html
+====
+submitSave: function() {
+  this.clearMessages();
+  api({
+    // 登録済みかどうかでHTTPメソッドとエンドポイントを切り替える
+    method: this.isCreated ? "put" : "post",
+    url: this.isCreated
+      ? "/books/" + this.form.book.id + "/"
+      : "/books/",
+    data: {
+      id: this.form.book.id,
+      title: this.form.book.title,
+      price: this.form.book.price
+    }
+  })
+```
+
+#### Stateとその更新。ここではStateを直に書き換えている。
+```
+templates/index.html
+====
+data: {
+  // 入力フォームの内容
+  form: {
+    book: {
+      title: "",
+      price: 0
+    }
+  },
+  // メッセージエリアに表示するメッセージ
+  message: {
+    info: "",
+    warnings: [],
+    error: ""
+  }
+},
+
+templates/index.html
+====
+.then(response => {
+  this.message.info = this.isCreated
+    ? "更新しました。"
+    : "登録しました。";
+  this.form.book = response.data;
+})
+```
+
+#### Stateの参照（message）
+```
+templates/index.html
+====
+<!-- メッセージエリア -->
+<div id="messages">
+  <b-alert variant="danger" show v-show="message.error" class="mb-0">
+    ${ message.error }
+  </b-alert>
+
+Stateの参照（form）
+
+templates/index.html
+====
+<!-- メインエリア -->
+<div id="main-page">
+  <main class="container mt-5 p-5">
+    <p class="h5 mb-5">ホーム</p>
+    <b-form v-on:submit.prevent="submitSave">
+      <div class="row form-group">
+        <label class="col-sm-3 col-form-label">タイトル</label>
+        <div class="col-sm-8">
+          <b-input type="text" class="form-control" v-model="form.book.title" />
+        </div>
+      </div>
+```
+        
+
 
 
 ### ルーティング
@@ -253,7 +387,7 @@ urlpatterns = [
 ```
 
 
-#### ◆router.register('books', views.BookViewSet)
+#### router.register('books', views.BookViewSet)
 
 "http://127.0.0.1:8000/api/v1/books/" が下記を返す
 ```
@@ -273,13 +407,9 @@ Vary: Accept
 ```
 
 
-#### ◆path('api-auth/', include('rest_framework.urls')),
+#### path('api-auth/', include('rest_framework.urls')),
 - api-auth/login/
 - api-auth/logout/
-
-
-### フロントエンド
-- templates/index.html に埋め込まれている
 
 　
 ## 質問
